@@ -4,7 +4,7 @@ import jwt
 SECRET_KEY='HARSH_RANA'
 ALGORITHM='HS256'
 ACCESS_TOKEN_EXPIRES_MINUTES=15
-def create_acess_token(data:dict):
+def create_access_token(data:dict):
     expiration =datetime.utcnow()+timedelta(minutes=ACCESS_TOKEN_EXPIRES_MINUTES)
     to_encode =data.copy()
     to_encode["exp"] = expiration
