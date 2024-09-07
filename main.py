@@ -9,6 +9,7 @@ from tokenfuncs import create_access_token, decode_acess_token
 from db.database import get_db
 from Models import Users
 from hashing import verify_password, hashPassword
+from .routers import calls
 import jwt 
 import requests
 
@@ -52,6 +53,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session=Depends(ge
     except jwt.PyJWTError:
         raise credentials_exception
     return user
+
+
+app.include_router(calls.router)
 
 class TokenRequest(BaseModel):
     token: str

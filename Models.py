@@ -1,7 +1,6 @@
 from db.base import Base
-from sqlalchemy import Column, String, Integer, Date
+from sqlalchemy import Column, String, Integer, DateTime, Boolean
 from sqlalchemy.ext.hybrid import hybrid_property
-from typing import List
 import enum
 
 class CallStatus(enum.Enum):
@@ -25,11 +24,11 @@ class Calls(Base):
 
     call_id=Column(Integer, primary_key=True, index=True)
     host_id=Column(Integer, nullable=False)
-    scheduled_at=Column(Date, nullable=True)
-    started_at=Column(Date, nullable=False)
-    ended_at=Column(Date, nullable=True)
-    call_members=Column(List[Integer], nullable=False)
-    is_call_private=Column(bool, nullable=True)
+    scheduled_at=Column(DateTime, nullable=True)
+    started_at=Column(DateTime, nullable=False)
+    ended_at=Column(DateTime, nullable=True)
+    # call_members=Column(List[Integer], nullable=False)
+    is_call_private=Column(Boolean, nullable=True)
 
 
     @hybrid_property
