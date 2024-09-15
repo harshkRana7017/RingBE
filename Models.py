@@ -1,3 +1,4 @@
+from numbers import Number
 from db.base import Base
 from sqlalchemy import Column, String, Integer, DateTime, Boolean
 from sqlalchemy.ext.hybrid import hybrid_property

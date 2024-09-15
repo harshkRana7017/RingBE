@@ -9,6 +9,7 @@ from Schemas.user import LoginUser, SignUpUser
 from db.database import get_db
 from hashing import hashPassword, verify_password
 from tokenfuncs import create_access_token
+from utils.get_user import get_current_user
 
 router = APIRouter()
 
@@ -55,6 +56,7 @@ def get_token(token_request: TokenRequest, db:Session = Depends(get_db)):
 def read_route(request: Request):
     return {"message": "Hello World"}
 
+
 @router.post("/signup")
 def signup(request:Request, userData: SignUpUser, db:Session=Depends(get_db)):
     new_user = Users(username=userData.username, email=userData.email, hashed_password=hashPassword(userData.password))
@@ -79,6 +81,17 @@ def get_token(request:Request, userData:LoginUser, db:Session = Depends(get_db))
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect Passwor")
      else:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User Not Found")
+     
+def fetch_me(db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User Not Found")
+    
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+    }
+
      
 
      
