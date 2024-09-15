@@ -22,7 +22,10 @@ def create_call(
     # new_call["call_members"]=[user.id]
     new_call["call_id"]=len+1
     new_call["is_call_private"]=call_data.is_call_private
-    new_call["started_at"]=datetime.now()
+    if call_data.scheduled_at:
+        new_call["scheduled_at"] = call_data.scheduled_at
+    else:
+        new_call["started_at"]=datetime.now()
     db.add(Calls(**new_call))
     db.commit()
     return {"message":"Call Scheduled Sucessfully", "call":new_call}

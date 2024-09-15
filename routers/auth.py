@@ -5,7 +5,7 @@ import requests
 from sqlalchemy import inspect
 
 from Models import Users
-from Schemas.user import LoginUser, SignUpUser
+from Schemas.user import ForgotPass, LoginUser, SignUpUser
 from db.database import get_db
 from hashing import hashPassword, verify_password
 from tokenfuncs import create_access_token
@@ -82,6 +82,7 @@ def get_token(request:Request, userData:LoginUser, db:Session = Depends(get_db))
      else:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User Not Found")
      
+@router.get('/fetch/me')
 def fetch_me(db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User Not Found")
@@ -92,6 +93,18 @@ def fetch_me(db: Session = Depends(get_db), user: Users = Depends(get_current_us
         "email": user.email,
     }
 
+@router.post('/forgot-password')
+def forgot_password(user_data:ForgotPass,db:Session= Depends(get_db) ):
+        user=db.query(Users).filter(Users.email ==user_data.email).first()
+        if not user:
+            raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found with this email"
+        )
+        else:
+            user.hashed_password=hashPassword(user_data.new_pass)
+            db.commit()
+            return {"message":"password changed sucessfully"}
      
 
      

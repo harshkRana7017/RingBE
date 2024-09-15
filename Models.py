@@ -26,7 +26,7 @@ class Calls(Base):
     call_id=Column(Integer, primary_key=True, index=True)
     host_id=Column(Integer, nullable=False)
     scheduled_at=Column(DateTime, nullable=True)
-    started_at=Column(DateTime, nullable=False)
+    started_at=Column(DateTime, nullable=True)
     ended_at=Column(DateTime, nullable=True)
     # call_members=Column(List[Integer], nullable=False)
     is_call_private=Column(Boolean, nullable=True)
