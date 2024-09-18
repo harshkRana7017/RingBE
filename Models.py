@@ -1,7 +1,8 @@
 from numbers import Number
 from db.base import Base
-from sqlalchemy import Column, String, Integer, DateTime, Boolean
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 import enum
 
 class CallStatus(enum.Enum):
@@ -9,6 +10,12 @@ class CallStatus(enum.Enum):
     live="Live"
     scheduled="Scheduled"
 
+class Call_Members(Base):
+    __tablename__="call_members"
+
+    call_id=Column(Integer, ForeignKey('calls.id'), primary_key=True, index=True)
+    user_id=Column(Integer, ForeignKey('users.id'), primary_key=True, index=True)
+    
     
 
 class Users(Base):
@@ -19,6 +26,9 @@ class Users(Base):
     email=Column(String, unique=True, index=True, nullable=False)
     hashed_password=Column(String, nullable=False)
 
+    calls =relationship('Calls', secondary='call_members', back_populates='users')
+
+
 
 class Calls(Base):
     __tablename__="calls"
@@ -28,8 +38,10 @@ class Calls(Base):
     scheduled_at=Column(DateTime, nullable=True)
     started_at=Column(DateTime, nullable=True)
     ended_at=Column(DateTime, nullable=True)
-    # call_members=Column(List[Integer], nullable=False)
     is_call_private=Column(Boolean, nullable=True)
+
+    members=relationship('Users', secondary='call_members', back_populates='calls')
+
 
 
     @hybrid_property
