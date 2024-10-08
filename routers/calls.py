@@ -26,13 +26,13 @@ def create_call(
         scheduled_at=call_data.scheduled_at if call_data.scheduled_at else None,
         started_at=datetime.now() if not call_data.scheduled_at else None
     )
-    member_ids = call_data.member_ids
+    member_emails = call_data.member_emails
     call_members=[]
-    if member_ids :
-         for member_id in member_ids:
-                current_member=db.query(Users).filter(Users.id == member_id).first()
+    if member_emails :
+         for member_email in member_emails:
+                current_member=db.query(Users).filter(Users.email == member_email).first()
                 if not current_member:
-                    raise HTTPException(status_code=404, detail=f"User with id {member_id} not found")
+                    raise HTTPException(status_code=404, detail=f"User with email {member_email} not found")
                 call_members.append(current_member)
     
     new_call.members = call_members
@@ -66,8 +66,8 @@ def reschedule_call(call_id:int,
     call = db.query(Calls).filter(Calls.call_id == call_id).first()
     if not call:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Call not found")
-    if user.id not in call.members:
-        raise HTTPException(status_code=403, detail="You are not a member of this call")
+    # if user.id not in call.members:
+    #     raise HTTPException(status_code=403, detail="You are not a member of this call")
     call.scheduled_at = reschedule_time
     db.commit()
     return {"message":"Call Rescheduled Sucessfully"} 
@@ -77,7 +77,11 @@ def reschedule_call(call_id:int,
 # Get all hosted Calls by a User
 @router.get("/calls/hosted")
 def get_hosted_calls(db:Session=Depends(get_db),user:Users=Depends(get_current_user)):
-    return db.query(Calls).filter(Calls.host_id == user.id).all()
+    return db.query(Calls).filter(Calls.host_id == user.id, Calls.scheduled_at==None).all()
+
+@router.get("/calls/scheduled")
+def get_scheduled_calls(db:Session=Depends(get_db),user:Users=Depends(get_current_user)):
+    return db.query(Calls).filter(Calls.host_id == user.id, Calls.scheduled_at !=None).all()
 
 # Get all calls for which user is a member 
 @router.get("/member/calls")
@@ -93,8 +97,8 @@ def get_call_members(call_id:int,db:Session = Depends(get_db), user:Users= Depen
     call = db.query(Calls).filter(Calls.call_id == call_id).first()
     if not call:
         raise HTTPException(status_code=404, detail='Call not found')
-    if user.id not in call.members:
-        raise HTTPException(status_code=403, detail="You are not a member of this call")
+    # if user.id not in call.members:
+    #     raise HTTPException(status_code=403, detail="You are not a member of this call")
     return  {"call": call, "members": call.members}
 
 # Add Call Members to a Call
