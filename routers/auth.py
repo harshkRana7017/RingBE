@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from requests import Session
 import requests
 from sqlalchemy import inspect
@@ -18,7 +18,7 @@ class TokenRequest(BaseModel):
     token: str
     
 @router.post('/auth/google')
-def get_token(token_request: TokenRequest, db:Session = Depends(get_db)):
+def get_google_token(token_request: TokenRequest, db:Session = Depends(get_db)):
     try:
         
         response= requests.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={token_request.token}")
@@ -105,8 +105,15 @@ def forgot_password(user_data:ForgotPass,db:Session= Depends(get_db) ):
             user.hashed_password=hashPassword(user_data.new_pass)
             db.commit()
             return {"message":"password changed sucessfully"}
-     
+        
 
+@router.get('/is_email_user/{email}')
+def get_is_email_user(email:EmailStr, db:Session = Depends(get_db), current_user:Users = Depends(get_current_user)):
+    user = db.query(Users).filter(Users.email == email).first()
+    if user:
+        return True
+    else:
+        return False
      
 
 

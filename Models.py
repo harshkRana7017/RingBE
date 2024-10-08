@@ -13,7 +13,7 @@ class CallStatus(enum.Enum):
 class Call_Members(Base):
     __tablename__="call_members"
 
-    call_id=Column(Integer, ForeignKey('calls.id'), primary_key=True, index=True)
+    call_id=Column(Integer, ForeignKey('calls.call_id'), primary_key=True, index=True)
     user_id=Column(Integer, ForeignKey('users.id'), primary_key=True, index=True)
     
     
@@ -26,7 +26,7 @@ class Users(Base):
     email=Column(String, unique=True, index=True, nullable=False)
     hashed_password=Column(String, nullable=False)
 
-    calls =relationship('Calls', secondary='call_members', back_populates='users')
+    calls =relationship('Calls', secondary='call_members', back_populates='members')
 
 
 
