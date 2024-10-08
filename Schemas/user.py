@@ -8,5 +8,9 @@ class SignUpUser(BaseModel):
     email:EmailStr
     password:str
 
+class ForgotPass(BaseModel):
+    email:EmailStr
+    new_pass:str
     
+
 
